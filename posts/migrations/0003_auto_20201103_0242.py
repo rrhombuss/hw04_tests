@@ -28,8 +28,5 @@ class Migration(migrations.Migration):
                                     blank=True, null=True,
                                     on_delete=django.db.models.deletion.CASCADE,
                                     related_name='posts', to='posts.Group'),
-                                    # если не только табов делать пеп показывает
-                                    # continuation line unaligned for hanging indent
-                                    # а так показывает слишком длинная строка #
         ),
     ]
