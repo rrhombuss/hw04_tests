@@ -9,33 +9,31 @@ class URLAccessTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        Group.objects.create(
+        cls.group = Group.objects.create(
             title='grouptitle',
             slug='groupslug'
         )
 
     def setUp(self):
+        User = get_user_model()
         self.guest_client = Client()
         self.auth_client = Client()
         self.another_auth_client = Client()
-        User = get_user_model()
         self.user = User.objects.create_user(username='adda')
         self.auth_client.force_login(self.user)
         self.another_user = User.objects.create_user(username='daad')
         self.another_auth_client.force_login(self.another_user)
 
-        Post1 = self.auth_client.post(reverse('new_post'),
-                                      data={
-                                            'group': Group.objects.get(
-                                             slug='groupslug'),
-                                            'text': 'posttext'
-                                             }
-                                      )
-        post_id = Post.objects.get(author='adda', text='posttext').id
+        self.post = Post.objects.create(author=self.user,
+                                        group=URLAccessTests.group,
+                                        text='posttext')
 
     def test_url_access(self):
-        urls = ['/', '/group/groupslug',
-                '/new', '/adda', '/adda/<int:post_id>']
+        urls = [reverse('index'),
+                reverse('group_posts', kwargs={'slug': 'groupslug'}),
+                reverse('new_post'),
+                reverse('profile', kwargs={'username': 'adda'}),
+                reverse('post', kwargs={'username': 'adda', 'post_id': self.post.id})]
         for url in urls:
             with self.subTest():
                 response = self.auth_client.get(url)
@@ -43,7 +41,10 @@ class URLAccessTests(TestCase):
 
     def test_unauth_redirect(self):
         response = self.guest_client.get('/new', follow=True)
-        self.assertRedirects(response, '/auth/login/?next=/new')
+        self.assertRedirects(response, '/auth/login/')
+        # вылезают огромные ошибки, и с test_post_edit_accessablity так же
+        # причем что то с файлами джанго и в конце
+        # TemplateDoesNotExist: base.html #
 
     def test_flatpages(self):
         response1 = self.guest_client.get('/about-us/')
@@ -56,22 +57,29 @@ class URLAccessTests(TestCase):
         self.assertEqual(response4.status_code, 200)
 
     def test_post_edit_accessablity(self):
-        response1 = self.guest_client.get('/adda/<int:post_id>/edit',
+        response1 = self.guest_client.get(
+            reverse('post_edit', kwargs={'username': 'adda', 'post_id': self.post.id}),
                                           follow=True)
         self.assertRedirects(response1, '/auth/login')
-        response2 = self.auth_client.get('/adda/<int:post_id>/edit',
+        response2 = self.auth_client.get(
+            reverse('post_edit', kwargs={'username': 'adda', 'post_id': self.post.id}),
                                          follow=True)
         self.assertEqual(response2.status_code, 200)
-        response3 = self.another_auth_client.get('/adda/<int:post_id>/edit',
+        response3 = self.another_auth_client.get(
+            reverse('post_edit', kwargs={'username': 'adda', 'post_id': self.post.id}),
                                                  follow=True)
-        self.assertRedirects(response3, '/adda/<int:post_id>')
+        self.assertRedirects(response3, reverse('post',
+                                                kwargs={'username': 'adda',
+                                                'post_id': self.post.id}))
 
     def test_templates_correct(self):
         templates_urls = {
-            'templates/index.html': '/',
-            'templates/group': '/group/groupslug',
-            'templates/new_post': '/new',
-            'templates/new_post': '/adda/<int:post_id>/edit',
+            'index.html': reverse('index'),
+            'group.html': reverse('group_posts', kwargs={'slug': 'groupslug'}),
+            'new_post.html': reverse('new_post'),
+            'edit_post.html': reverse('post_edit', 
+                                      kwargs={'username': 'adda',
+                                     'post_id': self.post.id}),
         }
         for template, url in templates_urls.items():
             with self.subTest():

@@ -1,0 +1,17 @@
+<div class="card-body">
+    <p class="card-text">
+            <!-- Ссылка на страницу автора в атрибуте href; username автора в тексте ссылки -->
+            <a href="{% url 'post' post.author.username post.id %}"><strong class="d-block text-gray-dark">{{ author.username }}</strong></a>
+            {{ post.text }}<!-- Текст поста -->
+    </p>
+    <div class="d-flex justify-content-between align-items-center">
+            <div class="btn-group ">
+                    <!-- Ссылка на редактирование, показывается только автору записи -->
+                    {% if user == post.author %}
+                        <a class="btn btn-sm text-muted" href="{% url 'post_edit' author post.id %}" role="button">Редактировать</a>
+                    {% endif %}
+            </div>
+            <!-- Дата публикации  -->
+            <small class="text-muted">{{ post.pub_date | date }}</small>
+    </div>
+</div>

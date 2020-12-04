@@ -9,18 +9,17 @@ class PostModelTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        Group.objects.create(
+        cls.group = Group.objects.create(
             title='testtest',
             slug='slug1'
         )
-        cls.group = Group.objects.get(slug='slug1')
 
     def setUp(self):
         User = get_user_model()
         self.user = User.objects.create_user(username='adda')
         self.auth_user = Client()
         self.auth_user.force_login(self.user)
-        self.post = Post.objects.create(author=self.auth_user,
+        self.post = Post.objects.create(author=self.user,
                                         group=PostModelTest.group,
                                         text='posttext')
 
@@ -34,6 +33,7 @@ class PostModelTest(TestCase):
             with self.subTest(value=value):
                 self.assertEqual(
                     self.post._meta.get_field(value).verbose_name, expected)
+    # тут почему то ошибка 'posttext' != 'Текст', хотя группа проходит #
 
     def test_help_text(self):
         """help_text в полях совпадает с ожидаемым."""

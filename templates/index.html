@@ -1,9 +1,9 @@
-{% extends "base.html" %}
+{% extends "includes/base.html" %}
 {% block title %}Последние обновления на сайте{% endblock %}
 {% block header %}Последние обновления на сайте{% endblock %}
 {% block content %}
 
-    {% for post in posts %}
+    {% for post in page %}
     <h3>
         Автор: {{ post.author.get_full_name }}, Дата публикации: {{ post.pub_date|date:"d M Y" }}
     </h3>
@@ -12,7 +12,7 @@
     {% endfor %}
 
     {% if page.has_other_pages %}
-      {% include "paginator.html" with items=page paginator=paginator%}
+      {% include "includes/paginator.html" with items=page paginator=paginator%}
     {% endif %}
 
 {% endblock %}
