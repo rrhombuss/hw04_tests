@@ -32,9 +32,9 @@ class TestAddingPost(TestCase):
             data=form_data,
             follow=True
         )
-        true = Post.objects.filter(text='added_text')
+        existing_post = Post.objects.filter(text='added_text')
         self.assertEqual(Post.objects.count(), post_count + 1)
-        self.assertTrue(true)
+        self.assertTrue(existing_post)
 
     def test_edit_post(self):
         self.auth_user.post(
@@ -43,7 +43,6 @@ class TestAddingPost(TestCase):
             data={'text': 'new_text'},
             follow=True
                             )
-        self.post.save()
         self.post.refresh_from_db()
         text = self.post.text
         self.assertEqual(text, 'new_text')

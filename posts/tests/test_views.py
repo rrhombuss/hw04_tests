@@ -97,12 +97,11 @@ class TestTemplateView(TestCase):
         # не очень понимаю, зачем тут рефрешить, если никаких
         # изменений не было в аргументах поста
         # и я что как не пробовал не понял как проверить те ли посты 
-        # передаются с контекстом #
+        # передаются с контекстом данный вариант возвращает 
+        # <QuerySet [<Post: posttext>]> != <QuerySet [<Post: posttext>]>#
         self.assertEqual(count, 1)
         self.assertEqual(author.username, 'adda')
-        self.assertEqual(post, Post.objects.get(
-            author__username='adda')
-            )
+        self.assertEqual(post, author.posts.all())
 
     def test_post_view(self):
         post_id = get_object_or_404(Post, author__username='adda',

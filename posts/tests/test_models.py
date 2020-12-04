@@ -33,7 +33,6 @@ class PostModelTest(TestCase):
             with self.subTest(value=value):
                 self.assertEqual(
                     self.post._meta.get_field(value).verbose_name, expected)
-    # тут почему то ошибка 'posttext' != 'Текст', хотя группа проходит #
 
     def test_help_text(self):
         """help_text в полях совпадает с ожидаемым."""
@@ -48,7 +47,7 @@ class PostModelTest(TestCase):
 
     def test_str_post(self):
         expected = self.post.text[:15]
-        self.assertEquals(expected, 'Текст')
+        self.assertEquals(expected, 'posttext')
 
     def test_str_group(self):
         expected = PostModelTest.group.title

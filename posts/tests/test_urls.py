@@ -40,8 +40,8 @@ class URLAccessTests(TestCase):
                 self.assertEqual(response.status_code, 200)
 
     def test_unauth_redirect(self):
-        response = self.guest_client.get('/new', follow=True)
-        self.assertRedirects(response, '/auth/login/')
+        response = self.guest_client.get(reverse('new_post'), follow=True)
+        self.assertRedirects(response, '/auth/login/?next=/new/')
         # вылезают огромные ошибки, и с test_post_edit_accessablity так же
         # причем что то с файлами джанго и в конце
         # TemplateDoesNotExist: base.html #
@@ -60,7 +60,7 @@ class URLAccessTests(TestCase):
         response1 = self.guest_client.get(
             reverse('post_edit', kwargs={'username': 'adda', 'post_id': self.post.id}),
                                           follow=True)
-        self.assertRedirects(response1, '/auth/login')
+        self.assertRedirects(response1, '/auth/login/?next=/adda/1/edit/')
         response2 = self.auth_client.get(
             reverse('post_edit', kwargs={'username': 'adda', 'post_id': self.post.id}),
                                          follow=True)
