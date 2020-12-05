@@ -29,6 +29,7 @@ def group_posts(request, slug):
                    'page': page, 'paginator': paginator}
                   )
 
+
 @login_required
 def new_post(request):
     form = PostForm(request.POST or None)
@@ -59,6 +60,7 @@ def post_view(request, username, post_id):
     author = get_object_or_404(User, username=username)
     post = get_object_or_404(Post, id=post_id, author__username=username)
     return render(request, 'post.html', {'author': author, 'post': post})
+
 
 @login_required
 def post_edit(request, username, post_id):

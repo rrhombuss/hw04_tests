@@ -46,5 +46,3 @@ class TestAddingPost(TestCase):
         self.post.refresh_from_db()
         text = self.post.text
         self.assertEqual(text, 'new_text')
-# почему то изменение поста через форму не работает 
-# 'posttext' != 'new_text' #
